@@ -1,0 +1,9 @@
+.idea/
+*.iml
+.project
+.settings
+.classpath
+pp-ftp4node/node-v8.11.3-linux-x64
+pp-ftp4node/node_src/node_modules
+pp-ftp4node/node_src/package-lock.json
+
