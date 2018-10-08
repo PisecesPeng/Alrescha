@@ -3,7 +3,6 @@ CREATE DATABASE alrescha;
 -- 使用database
 use alrescha;
 
-
 -- 用户
 CREATE TABLE `tb_user` (
   `user_id` bigint NOT NULL AUTO_INCREMENT,
@@ -14,7 +13,7 @@ CREATE TABLE `tb_user` (
   `status` tinyint COMMENT '状态  0：禁用  1：正常',
   `create_time` datetime COMMENT '创建时间',
   PRIMARY KEY (`user_id`),
-  UNIQUE INDEX (`username`)
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户';
 
 -- 用户Token
