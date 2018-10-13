@@ -23,6 +23,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <boot.mybatis.version>1.3.2</boot.mybatis.version>
+        <swagger.version>2.8.0</swagger.version>
     </properties>
 
     <dependencies>
@@ -39,7 +40,6 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
             <version>${boot.mybatis.version}</version>
         </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -49,6 +49,16 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
         </dependency>
     </dependencies>
 
@@ -60,6 +70,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
