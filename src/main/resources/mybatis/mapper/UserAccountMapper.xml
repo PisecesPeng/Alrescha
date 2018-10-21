@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.pipe.alrescha.mapper.UserAccountMapper" >
+    <resultMap id="UserResult" type="me.pipe.alrescha.entity.UserEntity" >
+        <id column="user_id" property="userId" jdbcType="BIGINT" />
+        <result column="username" property="username" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="salt" property="salt" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="status" property="status" jdbcType="TINYINT" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="al_user_property" >
+        user_id, username, password, salt, email, status, create_time
+    </sql>
+
+    <select id="saveUserAccount" parameterType="me.pipe.alrescha.entity.UserEntity">
+        INSERT INTO
+        al_user(<include refid="al_user_property" />)
+        VALUES(#{userId}, #{username}, #{password}, #{salt}, #{email}, #{status}, #{createTime})
+    </select>
+
+    <select id="queryUserById" parameterType="java.lang.Long" resultMap="UserResult" >
+        SELECT
+        <include refid="al_user_property" />
+        FROM al_user
+        WHERE user_id = #{user_id}
+    </select>
+
+</mapper>

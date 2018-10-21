@@ -1,0 +1,2 @@
+-- 初始数据(id:'admin',pw:'admin')
+INSERT INTO `al_user` (`user_id`, `username`, `password`, `salt`, `email`, `status`, `create_time`) VALUES ('1', 'admin', '9ec9750e709431dad22365cabc5c625482e574c74adaebba7dd02f1129e4ce1d', 'YzcmCZNvbXocrsz9dm8e', 'Piseces.Peng@gmail.com', '1', '2018-10-01 00:00:00');

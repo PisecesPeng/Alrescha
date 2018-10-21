@@ -42,7 +42,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("Alrescha")
-                .description("\"Alrescha APIs Docs\"")
+                .description("\"Alrescha API Docs\"")
                 .version("0.0.1")
                 .build();
     }
