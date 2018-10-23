@@ -16,6 +16,8 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -102,7 +104,7 @@ public class UserAccountController extends AbstractController {
     @SysLog("用户登录")
     @PostMapping("/login")
     @ApiOperation("user account login")
-    public R login(@RequestBody @ApiParam("login form") LoginForm form) {
+    public R login(@RequestBody @ApiParam("login form") LoginForm form, HttpServletRequest req) {
         if (userAccountService.isExistUserById(form.getId())) {
             UserEntity user = userAccountService.queryUserById(form.getId());
             // 验证密码
@@ -114,7 +116,8 @@ public class UserAccountController extends AbstractController {
                 return R.error("account is disable, please contact admin");
             }
             String token = sysTokenService.generateToken(form.getId());
-            setToken(token);
+            req.getSession().setAttribute("token", token);
+            // TODO put expire_time.
             return R.ok().put("token", token);
         }
         return R.error("this account is not exist");
@@ -123,8 +126,14 @@ public class UserAccountController extends AbstractController {
     @SysLog("用户登出")
     @PostMapping("/logout")
     @ApiOperation("user account logout")
-    public R logout() {
-        String token = getToken();
+    public R logout(HttpServletRequest req) {
+        // 防止创建session
+        HttpSession session = req.getSession(false);
+        if(session == null){
+            return R.ok();
+        }
+        String token = session.getAttribute("token").toString();
+        session.removeAttribute("token");
         if (sysTokenService.isExistToken(token)) {
             sysTokenService.deleteToken(token);
         }
