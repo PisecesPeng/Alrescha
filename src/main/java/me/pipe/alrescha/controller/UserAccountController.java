@@ -5,10 +5,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import me.pipe.alrescha.annotation.SysLog;
-import me.pipe.alrescha.entity.TokenEntity;
 import me.pipe.alrescha.entity.UserEntity;
 import me.pipe.alrescha.form.LoginForm;
-import me.pipe.alrescha.form.LogoutForm;
 import me.pipe.alrescha.form.RegisterForm;
 import me.pipe.alrescha.service.SysTokenService;
 import me.pipe.alrescha.service.UserAccountService;
@@ -18,7 +16,6 @@ import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user/account")
 @Api(value="user-account-controller", description="user account controller")
-public class UserAccountController {
+public class UserAccountController extends AbstractController {
 
     @Autowired
     UserAccountService userAccountService;
@@ -116,7 +113,9 @@ public class UserAccountController {
             if(user.getStatus() == Constant.AccountStatusType.Disable.getValue()){
                 return R.error("account is disable, please contact admin");
             }
-            return R.ok().put("token", sysTokenService.generateToken(form.getId()));
+            String token = sysTokenService.generateToken(form.getId());
+            setToken(token);
+            return R.ok().put("token", token);
         }
         return R.error("this account is not exist");
     }
@@ -124,8 +123,8 @@ public class UserAccountController {
     @SysLog("用户登出")
     @PostMapping("/logout")
     @ApiOperation("user account logout")
-    public R logout(@RequestBody @ApiParam("user token") LogoutForm form) {
-        String token = form.getToken();
+    public R logout() {
+        String token = getToken();
         if (sysTokenService.isExistToken(token)) {
             sysTokenService.deleteToken(token);
         }
