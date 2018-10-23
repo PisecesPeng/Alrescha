@@ -18,17 +18,43 @@
         user_id, username, password, salt, email, status, create_time
     </sql>
 
+    <!-- 保存用户帐号信息 -->
     <select id="saveUserAccount" parameterType="me.pipe.alrescha.entity.UserEntity">
         INSERT INTO
         al_user(<include refid="al_user_property" />)
         VALUES(#{userId}, #{username}, #{password}, #{salt}, #{email}, #{status}, #{createTime})
     </select>
 
+    <!-- 根据用户id, 查询用户信息 -->
     <select id="queryUserById" parameterType="java.lang.Long" resultMap="UserResult" >
         SELECT
         <include refid="al_user_property" />
         FROM al_user
         WHERE user_id = #{user_id}
+    </select>
+
+    <!-- 根据用户username, 查询用户信息 -->
+    <select id="queryUserByName" parameterType="java.lang.String" resultMap="UserResult" >
+        SELECT
+        <include refid="al_user_property" />
+        FROM al_user
+        WHERE username = #{username}
+    </select>
+
+    <!-- 根据用户id, 查询用户信息 -->
+    <select id="queryUser" resultMap="UserResult" >
+        SELECT
+        <include refid="al_user_property" />
+        FROM al_user
+        WHERE user_id = #{user_id} AND username = #{username}
+    </select>
+
+    <!-- 根据用户username, 查询用户信息(模糊查询) -->
+    <select id="fuzzyQueryUser" parameterType="java.lang.String" resultMap="UserResult" >
+        SELECT
+        <include refid="al_user_property" />
+        FROM al_user
+        WHERE username LIKE '%' #{username} '%'
     </select>
 
 </mapper>

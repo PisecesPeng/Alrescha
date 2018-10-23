@@ -5,8 +5,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import me.pipe.alrescha.annotation.SysLog;
+import me.pipe.alrescha.entity.TokenEntity;
 import me.pipe.alrescha.entity.UserEntity;
 import me.pipe.alrescha.form.LoginForm;
+import me.pipe.alrescha.form.LogoutForm;
 import me.pipe.alrescha.form.RegisterForm;
 import me.pipe.alrescha.service.SysTokenService;
 import me.pipe.alrescha.service.UserAccountService;
@@ -15,6 +17,12 @@ import me.pipe.alrescha.util.R;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -27,21 +35,53 @@ public class UserAccountController {
     @Autowired
     SysTokenService sysTokenService;
 
-    @SysLog("根据id查找用户, 返回是否存在此用户")
+    @SysLog("根据id/username查找用户, 返回是否存在此用户")
     @GetMapping("/isExistUser")
-    @ApiOperation("is exist user by id")
-    public R isExistUserById(@RequestParam(value="id", required=true) @ApiParam("user id") Long userId) {
-        Boolean isExist = userAccountService.isExistUserById(userId);
+    @ApiOperation("is exist user by id||username")
+    public R isExistUser(@RequestParam(value="id", required=false) @ApiParam("user id") Long userId,
+                             @RequestParam(value="username", required=false) @ApiParam("user name") String username) {
+        Boolean isExist;
+        if (userId == null) isExist = userAccountService.isExistUserByName(username);
+        else if (username == null) isExist = userAccountService.isExistUserById(userId);
+        else isExist = userAccountService.isExistUser(userId, username);
         return R.ok().put("isExistUser", isExist.toString());
     }
 
-    @SysLog("根据id查找用户, 返回该用户信息")
+    @SysLog("根据id/name查找用户, 返回该用户信息(精确查找)")
     @GetMapping("/queryUser")
-    @ApiOperation("query user by id")
-    public R queryUserById(@RequestParam(value="id", required=true) @ApiParam("user id") Long userId) {
-        UserEntity userEntity = userAccountService.queryUserById(userId);
-        userEntity.setPassword(null);
-        userEntity.setSalt(null);
+    @ApiOperation("query user by id||username")
+    public R queryUser(@RequestParam(value="id", required=false) @ApiParam("user id") Long userId,
+                           @RequestParam(value="username", required=false) @ApiParam("user name") String username) {
+        UserEntity userEntity = new UserEntity();
+        Optional<UserEntity> opt;
+
+        if (userId == null) opt = Optional.ofNullable(userAccountService.queryUserByName(username));
+        else if (username == null) opt = Optional.ofNullable(userAccountService.queryUserById(userId));
+        else opt = Optional.ofNullable(userAccountService.queryUser(userId, username));
+
+        if (opt.isPresent()) {
+            userEntity = opt.get();
+            userEntity.setPassword(null);
+            userEntity.setSalt(null);
+        }
+
+        return R.ok().put("user", new Gson().toJson(userEntity));
+    }
+
+    @SysLog("根据name查找用户, 返回该用户信息(模糊查找)")
+    @GetMapping("/fuzzyQueryUser")
+    @ApiOperation("fuzzy query user by username")
+    public R fuzzyQueryUser(@RequestParam(value="username") @ApiParam("user name") String username) {
+        List<UserEntity> userEntity = new ArrayList<>();
+
+        Optional<List<UserEntity>> opt = Optional.ofNullable(userAccountService.fuzzyQueryUser(username));
+
+        if (opt.isPresent())
+            userEntity = opt.get().stream()
+                    .peek(u -> u.setPassword(null))
+                    .peek(u -> u.setSalt(null))
+                    .collect(Collectors.toList());
+
         return R.ok().put("user", new Gson().toJson(userEntity));
     }
 
@@ -78,7 +118,18 @@ public class UserAccountController {
             }
             return R.ok().put("token", sysTokenService.generateToken(form.getId()));
         }
-        return R.error("user account is not exist");
+        return R.error("this account is not exist");
+    }
+
+    @SysLog("用户登出")
+    @PostMapping("/logout")
+    @ApiOperation("user account logout")
+    public R logout(@RequestBody @ApiParam("user token") LogoutForm form) {
+        String token = form.getToken();
+        if (sysTokenService.isExistToken(token)) {
+            sysTokenService.deleteToken(token);
+        }
+        return R.ok();
     }
 
 }

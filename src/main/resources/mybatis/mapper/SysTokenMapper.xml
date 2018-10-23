@@ -15,6 +15,7 @@
         user_id, token, expire_time, update_time
     </sql>
 
+    <!-- 根据用户id, 查询Token -->
     <select id="queryTokenById" parameterType="java.lang.Long" resultMap="TokenResult" >
         SELECT
         <include refid="user_token_property" />
@@ -22,6 +23,15 @@
         WHERE user_id = #{user_id}
     </select>
 
+    <!-- 根据用户id, 查询Token -->
+    <select id="queryTokenByToken" parameterType="java.lang.String" resultMap="TokenResult" >
+        SELECT
+        <include refid="user_token_property" />
+        FROM user_token
+        WHERE token = #{token}
+    </select>
+
+    <!-- 更新Token -->
     <update id="updateToken" parameterType="me.pipe.alrescha.entity.TokenEntity" >
         UPDATE
         user_token
@@ -29,10 +39,16 @@
         WHERE user_id = #{userId}
     </update>
 
+    <!-- 插入Token -->
     <update id="insertToken" parameterType="me.pipe.alrescha.entity.TokenEntity" >
         INSERT INTO
         user_token(<include refid="user_token_property" />)
         VALUES(#{userId}, #{token}, #{expireTime}, #{updateTime})
     </update>
+
+    <!-- 删除Token -->
+    <select id="deleteToken" parameterType="java.lang.String" >
+        DELETE FROM user_token WHERE token = #{token}
+    </select>
 
 </mapper>

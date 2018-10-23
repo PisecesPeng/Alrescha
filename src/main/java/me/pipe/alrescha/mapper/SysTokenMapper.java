@@ -13,10 +13,17 @@ public interface SysTokenMapper {
     TokenEntity queryTokenById(@Param("user_id") Long userId);
 
     /**
+     * 根据用户id, 查询Token
+     */
+    TokenEntity queryTokenByToken(@Param("token") String token);
+
+    /**
      * 更新Token
      * 插入Token
+     * 删除Token
      */
     void updateToken(TokenEntity tokenEntity);
     void insertToken(TokenEntity tokenEntity);
+    void deleteToken(@Param("token") String token);
 
 }
