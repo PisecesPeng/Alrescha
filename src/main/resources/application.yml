@@ -6,17 +6,43 @@ server:
     min-spare-threads: 30
   port: 9999
   connection-timeout: 5000ms
+  servlet:
+    session:
+      timeout: 43200s
 
 spring:
   # 环境 mysql|h2
   profiles:
     active: mysql
+
   # jackson时间格式化
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
 
+  # 配置redis
+  cache:
+    type: redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: q1w2e3r4
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+        shutdown-timeout: 100ms
+
 mybatis:
   type-aliases-package: me.pipe.alrescha.entity
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: classpath:mybatis/mapper/*.xml
+
+debug: true
+logging:
+  level:
+    com:
+      springbootmybatis:
+        mapper: debug
