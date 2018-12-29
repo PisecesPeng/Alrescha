@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequestMapping("/user/account")
 @Api(value="user-account-controller", description="user account controller")
@@ -88,7 +87,6 @@ public class UserAccountController extends AbstractController {
     @PostMapping("/register")
     @ApiOperation("user account register")
     public R register(@RequestBody @ApiParam("register form") RegisterForm form) {
-
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(form.getId());
         userEntity.setUsername(form.getUsername());
@@ -105,8 +103,9 @@ public class UserAccountController extends AbstractController {
     @PostMapping("/login")
     @ApiOperation("user account login")
     public R login(@RequestBody @ApiParam("login form") LoginForm form, HttpServletRequest req) {
-        if (userAccountService.isExistUserById(form.getId())) {
-            UserEntity user = userAccountService.queryUserById(form.getId());
+        Long id = form.getId();
+        if (userAccountService.isExistUserById(id)) {
+            UserEntity user = userAccountService.queryUserById(id);
             // 验证密码
             if(!user.getPassword().equals(new Sha256Hash(form.getPassword(), user.getSalt()).toHex())) {
                 return R.error("user login fail");
@@ -115,9 +114,8 @@ public class UserAccountController extends AbstractController {
             if(user.getStatus() == Constant.AccountStatusType.Disable.getValue()){
                 return R.error("account is disable, please contact admin");
             }
-            String token = sysTokenService.generateToken(form.getId());
+            String token = sysTokenService.generateToken(id);
             req.getSession().setAttribute("token", token);
-            // TODO put expire_time.
             return R.ok().put("token", token);
         }
         return R.error("this account is not exist");

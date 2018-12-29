@@ -38,6 +38,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         return opt.isPresent();
     }
 
+
     @Override
     public UserEntity queryUserById(Long userId) {
         return userAccountMapper.queryUserById(userId);
@@ -60,7 +61,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public void saveUserAccount(UserEntity userEntity) {
-
         userEntity.setCreateTime(new Date());
 		userEntity.setStatus(Constant.AccountStatusType.NORMAL.getValue());
 		// sha256加密
